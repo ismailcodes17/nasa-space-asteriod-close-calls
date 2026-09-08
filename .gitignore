@@ -1,0 +1,17 @@
+.env
+.env.local
+frontend/.env.local
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+frontend/.next/
+frontend/node_modules/
+.next/
+node_modules/
+.idea/
+.DS_Store
+*.pyc
+__pycache__/
+*.log
+space asteroids /
