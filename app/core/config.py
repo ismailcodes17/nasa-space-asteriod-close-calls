@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DATABASE_URL: str
     FRONTEND_URL: str = "http://localhost:3000"
-    NASA_API_KEY: str
+    NASA_API_KEY: str = "DEMO_KEY"
 
     model_config = SettingsConfigDict(env_file=str(ENV_FILE), env_file_encoding="utf-8")
 

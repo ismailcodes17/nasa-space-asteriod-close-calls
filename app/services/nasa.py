@@ -65,7 +65,10 @@ def get_asteroids(start: date | None = None, end: date | None = None, sort: str 
 
     for day, items in payload.get("near_earth_objects", {}).items():
         for item in items:
-            approach = item["close_approach_data"][0]
+            approaches = item.get("close_approach_data") or []
+            if not approaches:
+                continue
+            approach = approaches[0]
             diameter = item["estimated_diameter"]["kilometers"]
             distance_km = float(approach["miss_distance"]["kilometers"])
 
