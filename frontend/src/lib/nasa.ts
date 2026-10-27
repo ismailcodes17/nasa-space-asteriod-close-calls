@@ -1,23 +1,34 @@
 const NASA = "https://api.nasa.gov";
+const APOD = "https://science.nasa.gov/wp-json/wp/v2/apod-basic";
 const KEY = process.env.NASA_API_KEY || "DEMO_KEY";
 const MOON_KM = 384400;
 
+function plain(value: string) {
+  return value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function apodId(day: string) {
+  const [year, month, date] = day.split("-");
+  return `${year.slice(2)}${month}${date}`;
+}
+
 export async function loadApod(day?: string) {
-  const params = new URLSearchParams({ api_key: KEY });
-  if (day) params.set("date", day);
-  const response = await fetch(`${NASA}/planetary/apod?${params}`, { cache: "no-store" });
+  const url = day ? `${APOD}/${apodId(day)}` : `${APOD}?per_page=1`;
+  const response = await fetch(url, { cache: "no-store" });
   if (response.status === 404) throw new Error("APOD not found for that date");
   if (!response.ok) {
     const detail = await response.text();
     throw new Error(`NASA APOD error: ${response.status} ${detail.slice(0, 180)}`);
   }
-  const data = await response.json();
-  const mediaUrl = data.hdurl || data.url || "";
+  const payload = await response.json();
+  const data = Array.isArray(payload) ? payload[0] : payload;
+  if (!data || data.code) throw new Error("APOD not found for that date");
+  const mediaUrl = data.hdurl || "";
   if (!mediaUrl) throw new Error("NASA APOD response missing media url");
   return {
     date: data.date,
     title: data.title || "Untitled",
-    explanation: data.explanation || "",
+    explanation: plain(data.explanation || ""),
     media_url: mediaUrl,
     media_type: data.media_type || "image",
   };
