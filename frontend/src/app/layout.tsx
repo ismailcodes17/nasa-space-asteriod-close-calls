@@ -34,6 +34,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </nav>
         </header>
         {children}
+        <footer style={{ padding: "20px", fontSize: 14 }}>
+          <a href="https://ismailjeylani.vercel.app">Ismail Jeylani</a>
+        </footer>
       </body>
     </html>
   );
