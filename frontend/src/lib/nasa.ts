@@ -5,9 +5,12 @@ const MOON_KM = 384400;
 export async function loadApod(day?: string) {
   const params = new URLSearchParams({ api_key: KEY });
   if (day) params.set("date", day);
-  const response = await fetch(`${NASA}/planetary/apod?${params}`, { next: { revalidate: 3600 } });
+  const response = await fetch(`${NASA}/planetary/apod?${params}`, { cache: "no-store" });
   if (response.status === 404) throw new Error("APOD not found for that date");
-  if (!response.ok) throw new Error(`NASA APOD error: ${response.status}`);
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`NASA APOD error: ${response.status} ${detail.slice(0, 180)}`);
+  }
   const data = await response.json();
   const mediaUrl = data.hdurl || data.url || "";
   if (!mediaUrl) throw new Error("NASA APOD response missing media url");
@@ -29,7 +32,7 @@ export async function loadAsteroids(sort = "distance") {
     start_date: start.toISOString().slice(0, 10),
     end_date: end.toISOString().slice(0, 10),
   });
-  const response = await fetch(`${NASA}/neo/rest/v1/feed?${params}`, { next: { revalidate: 3600 } });
+  const response = await fetch(`${NASA}/neo/rest/v1/feed?${params}`, { cache: "no-store" });
   if (!response.ok) throw new Error(`NASA asteroid error: ${response.status}`);
   const payload = await response.json();
   const asteroids = [];
