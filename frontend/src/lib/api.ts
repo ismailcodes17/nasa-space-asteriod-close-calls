@@ -41,7 +41,7 @@ export type FavoriteAsteroid = {
   created_at: string;
 };
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
+async function request<T>(path: string, options?: RequestInit, base = API_URL): Promise<T> {
   const method = (options?.method || "GET").toUpperCase();
   const headers = new Headers(options?.headers || {});
 
@@ -49,7 +49,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     headers.set("Content-Type", "application/json");
   }
 
-  const res = await fetch(`${API_URL}${path}`, {
+  const res = await fetch(`${base}${path}`, {
     ...options,
     headers,
   });
@@ -76,11 +76,11 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export function fetchApod(day?: string) {
-  return request<Apod>(day ? `/apod/${day}` : "/apod");
+  return request<Apod>(day ? `/apod/${day}` : "/apod", undefined, "/api/v1");
 }
 
 export function fetchAsteroids(sort: "distance" | "speed" | "diameter" = "distance") {
-  return request<Asteroid[]>(`/asteroids?sort=${sort}`);
+  return request<Asteroid[]>(`/asteroids?sort=${sort}`, undefined, "/api/v1");
 }
 
 export function listFavoriteImages() {
